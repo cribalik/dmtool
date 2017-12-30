@@ -511,7 +511,7 @@ function item_display(item) {
         redirect("https://accounts.spotify.com/authorize" +
           "?client_id=" + client_id +
           "&response_type=token" +
-          "&redirect_uri=" + encodeURIComponent("http://rtensson.se/dnd/index.html") +
+          "&redirect_uri=" + encodeURIComponent("https://rtensson.se/dnd/index.html") +
           "&state=" + encodeURIComponent("spotifylogin " + input_get(search_field)) +
           "&scope=" + encodeURIComponent(scopes));
       } else {
