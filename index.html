@@ -248,46 +248,51 @@ var language_names = ["Common", "Goblin"];
 
 /* data */
 var items = [];
-items.push(monster_create("Goblin", SMALL, NEUTRAL_EVIL, 15, 7, 30, 8, 14, 10, 10, 8, 8,
-  ["Stealth +6"],
-  ["Darkvision 60ft", "Passive Perception 9"],
-  [LANG_COMMON, LANG_GOBLIN], 50,
-  [
-    ability_create("Nimble escape", "The goblin can take the Disengage or Hide action as a bonus action on each of its turns")
-  ],
-  [
-    attack_create("Scimitar", "Hit: +4, one target. Damage: 5 (1d6+2) slashing"),
-    attack_create("Shortbow", "Hit: +4, range 80/320. Damage: 5 (1d6+2) piercing")
-  ],
-  "Goblins are small, black-hearted humanoids that lair in despoiled dungeons and other dismal settings. Individually weak, they gather in large numberss to torment other creatures."));
-items.push(monster_create("Bugbear", MEDIUM, CHAOTIC_EVIL, 16, 27, 30, 15, 14, 13, 8, 11, 9,
-  ["Stealth +6", "Survival +2"],
-  ["Darkvision 60ft", "Passive Perception 10"],
-  [LANG_COMMON, LANG_GOBLIN], 200,
-  [
+items.push({
+  type: TYPE_MONSTER, name: "Goblin", size: SMALL, alignment: NEUTRAL_EVIL,
+  ac: 15, hp: 7, speed: 30, str: 8, dex: 14, con: 10, int: 10, wis: 8, cha: 8, xp: 50,
+  skills: ["Stealth +6"],
+  senses: ["Darkvision 60ft", "Passive Perception 9"],
+  languages: [LANG_COMMON, LANG_GOBLIN],
+  abilities: [ability_create("Nimble escape", "The goblin can take the Disengage or Hide action as a bonus action on each of its turns")],
+  actions: [attack_create("Scimitar", "Hit: +4, one target. Damage: 5 (1d6+2) slashing"), attack_create("Shortbow", "Hit: +4, range 80/320. Damage: 5 (1d6+2) piercing") ],
+  description: "Goblins are small, black-hearted humanoids that lair in despoiled dungeons and other dismal settings. Individually weak, they gather in large numberss to torment other creatures."
+});
+items.push({
+  type: TYPE_MONSTER, name: "Bugbear", size: MEDIUM, alignment: CHAOTIC_EVIL,
+  ac: 16, hp: 27, speed: 30, str: 15, dex: 14, con: 13, int: 8, wis: 11, cha: 9, xp: 200,
+  skills: ["Stealth +6", "Survival +2"],
+  senses: ["Darkvision 60ft", "Passive Perception 10"],
+  languages: [LANG_COMMON, LANG_GOBLIN],
+  abilities: [
     ability_create("Brute", "A melee weapon deals one extra die of its damage when the bugbear hits with it (included in the attack)."),
     ability_create("Suprise Attack", "If the bugbear surprises a reature and hits it with an attack during the first round of combat, the target takes an extra 7 (2d6) damage from the attack")
   ],
-  [
+  actions: [
     attack_create("Morningstar", "Hit: +4, one target. Damage: 11 (2d8+2) piercing"),
     attack_create("Javelin", "Hit: +4, melee damage: 9 (2d6+2) piercing or range 30/120ft 5 (1d6+2) piercing.")
   ],
-  "Bugbears are hairy goblinoids born for battle and mayhem. They survive by raiding and hunting, but are fond of setting ambushes and fleeing when outmatched."));
-items.push(monster_create("Wolf", MEDIUM, UNALIGNED, 13, 11, 40, 12, 15, 12, 3, 12, 6,
-  ["Perception +3", "Stealth +4"],
-  ["Passive Perception 13"],
-  [], 50,
-  [
+  description: "Bugbears are hairy goblinoids born for battle and mayhem. They survive by raiding and hunting, but are fond of setting ambushes and fleeing when outmatched."
+});
+items.push({
+  type: TYPE_MONSTER, name: "Wolf", size: MEDIUM, alignment: UNALIGNED,
+  ac: 13, hp: 11, speed: 40, str: 12, dex: 15, con: 12, int: 3, wis: 12, cha: 6, xp: 50,
+  skills: ["Perception +3", "Stealth +4"],
+  senses: ["Passive Perception 13"],
+  languages: [],
+  abilities: [
     ability_create("Keen Hearing and Smell", "The wolf has advantage on Wisdom (Perception) checks that rely on hearing or smell."),
     ability_create("Pack Tactics", "The wolf has advantage on attack rolls against a creature if at least one of the wolf's allies is within 5 feet of the creature and the ally isn't incapacitated.")
   ],
-  [
-    attack_create("Bite", "Hit: +4, one target. Damage: 7 (2d4+2) piercing. If the target is a creature, it must succeed on a DC 11 Strength saving throw or be knocked prone.")
-  ],
-  ""));
+  actions: [attack_create("Bite", "Hit: +4, one target. Damage: 7 (2d4+2) piercing. If the target is a creature, it must succeed on a DC 11 Strength saving throw or be knocked prone.")],
+  description: ""
+});
 items.push(magic_create("Mage fire"));
 items.push(magic_create("Small light"));
 items.push(magic_create("Hyper fart"));
+
+for (var i = 0; i < items.length; ++i)
+  verify_item(items[i]);
 
 var spotify_item = {type: TYPE_SPOTIFY, name: "Spotify"};
 var spotify_logged_in = false;
@@ -345,6 +350,49 @@ if (spotify_info) {
   update_search_results();
   item_display(spotify_item);
 }
+
+var _has_assert_failed = false;
+var _assert_msg = "";
+function assert_begin(msg) {
+  _assert_msg = msg;
+}
+function assert(bool) {
+  if (bool)
+    return;
+  if (_has_assert_failed)
+    return;
+  _has_assert_failed = true;
+  alert(_assert_msg);
+}
+
+function verify_item(item) {
+  switch (item.type) {
+    case TYPE_MONSTER:
+      assert_begin("invalid data for " + item.name);
+      assert(item.hasOwnProperty("type"));
+      assert(item.hasOwnProperty("name"));
+      assert(item.hasOwnProperty("size"));
+      assert(item.hasOwnProperty("alignment"));
+      assert(item.hasOwnProperty("ac"));
+      assert(item.hasOwnProperty("hp"));
+      assert(item.hasOwnProperty("speed"));
+      assert(item.hasOwnProperty("str"));
+      assert(item.hasOwnProperty("dex"));
+      assert(item.hasOwnProperty("con"));
+      assert(item.hasOwnProperty("int"));
+      assert(item.hasOwnProperty("wis"));
+      assert(item.hasOwnProperty("cha"));
+      assert(item.hasOwnProperty("skills"));
+      assert(item.hasOwnProperty("senses"));
+      assert(item.hasOwnProperty("languages"));
+      assert(item.hasOwnProperty("xp"));
+      assert(item.hasOwnProperty("abilities"));
+      assert(item.hasOwnProperty("actions"));
+      assert(item.hasOwnProperty("description"));
+      break;
+  }
+}
+
 
 function get_spotify_info() {
   // TODO: check for failed spotify login
@@ -650,31 +698,6 @@ function magic_create(name) {
   return {
     type: TYPE_MAGIC,
     name: name
-  };
-}
-
-function monster_create(name, size, align, ac, hp, speed, str, dex, con, int, wis, cha, skills, senses, languages, xp, abilities, actions, description) {
-  return {
-    type: TYPE_MONSTER,
-    name: name,
-    size: size,
-    alignment: align,
-    ac: ac,
-    hp: hp,
-    speed: speed,
-    str: str,
-    dex: dex,
-    con: con,
-    int: int,
-    wis: wis,
-    cha: cha,
-    skills: skills,
-    senses: senses,
-    languages: languages,
-    xp: xp,
-    abilities: abilities,
-    actions: actions,
-    description: description
   };
 }
 
