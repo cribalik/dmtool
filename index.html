@@ -1,0 +1,843 @@
+<html>
+<head>
+  <style>
+  	.noselect {
+  		-webkit-touch-callout: none;
+  		-webkit-user-select: none;
+  		-khtml-user-select: none;
+  		-moz-user-select: none;
+  		-ms-user-select: none;
+      user-select: none;
+    }
+    body {
+      font-family: sans-serif;
+      color: white;
+      background-color: #583e34;
+      margin: 0;
+      padding: 0;
+    }
+    body > table {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-spacing: 0;
+    }
+    table > tbody > tr > td {
+      padding: 0;
+    }
+    #search_container {
+      width: 20%;
+      background-color: #281a14;
+      height: 100%;
+      vertical-align: top;
+      padding: 10px;
+      text-align: center;
+    }
+    #search_field:focus {
+      border-color: #0277bd;
+    }
+    #search_field {
+      margin-bottom: 20px;
+      font-family: sans-serif;
+      padding: 10px;
+      background-color: black;
+      border: 3px solid #455a64;
+      color: #9e9e9e94;
+      outline: none;
+    }
+    #search_field.inserting {
+      color: white;
+    }
+    .hidden {
+      display: none;
+    }
+    #search_result > * {
+      padding: 10px;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    #search_result > .monster {
+      background-color: #b80b1b;
+      border: 3px solid #730810;
+    }
+    #search_result > .magic {
+      background-color: #673ab7;
+      border: 3px solid #331c5d;
+    }
+    #search_result > .spotify {
+      background-color: #2ebd59;
+      border: 3px solid #208a40;
+    }
+    #search_result > .selected {
+      border: 3px solid gold;
+    }
+    #item_container {
+    }
+    #item_container > * {
+      height: 100%;
+      background-color: #211a1a;
+      padding: 20px;
+    }
+    .text-huge {
+      font-size: 50px;
+    }
+    .text-mid {
+      font-size: 20px;
+    }
+    .text-small {
+      font-size: 16px;
+    }
+    #monster_stats {
+      width: 100%;
+    }
+    .wstretch {
+      width: 100%;
+    }
+    .wstretch80 {
+      width: 80%;
+    }
+    .center-div {
+      margin: auto;
+    }
+    .hstretch {
+      height: 100%;
+    }
+    .stretch {
+      width: 100%;
+      height: 100%;
+    }
+    table.text-bottom tr {
+      vertical-align: baseline;
+    }
+    .text-wcenter {
+      text-align: center;
+    }
+    .text-hcenter {
+      vertical-align: center;
+    }
+    #monster_sheet > * {
+      margin-bottom: 20px;
+    }
+    .stats_table {
+      width: 80%;
+      margin: auto;
+      text-align: center;
+      vertical-align: baseline;
+      padding: 10px;
+      /*background-color: grey;*/
+      border: 1px solid darkgrey;
+    }
+    .stats_table td {
+      margin: 10px;
+    }
+    .justify-equal {
+      table-layout: fixed;
+    }
+    .text-soft {
+      color: grey;
+    }
+    .text-strong {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <table><tbody>
+  <tr>
+    <td id="search_container" class="noselect">
+      <div id="search_field" tabindex="0">search</div>
+      <div id="search_result"></div>
+    </td>
+    <td id="item_container">
+      <div id="monster_sheet" class="hidden">
+        <table class="text-bottom"><tbody><tr>
+          <td><div id="monster_name" class="text-huge"></div></td>
+          <td><div id="monster_size"></div></td>
+        </tr></tbody></table>
+
+        <table class="stats_table justify-equal text-mid text-soft"><tbody><tr>
+          <td><div>XP</div><div id="monster_xp" class="text-huge text-strong"></div></td>
+          <td><div>AC</div><div id="monster_ac" class="text-huge text-strong"></div></td>
+          <td><div>HP</div><div id="monster_hp" class="text-huge text-strong"></div></td>
+          <td><div>Speed</div><div id="monster_speed" class="text-huge text-strong"></div></td>
+        </tr></tbody></table>
+
+        <table class="stats_table justify-equal text-mid text-soft"><tbody><tr>
+          <td><div>Str</div><div id="monster_str" class="text-huge text-strong"></div></td>
+          <td><div>Dex</div><div id="monster_dex" class="text-huge text-strong"></div></td>
+          <td><div>Con</div><div id="monster_con" class="text-huge text-strong"></div></td>
+          <td><div>Int</div><div id="monster_int" class="text-huge text-strong"></div></td>
+          <td><div>Wis</div><div id="monster_wis" class="text-huge text-strong"></div></td>
+          <td><div>Cha</div><div id="monster_cha" class="text-huge text-strong"></div></td>
+        </tr></tbody></table>
+
+        <div>
+          <div class="text-mid">Skills</div>
+          <div id="monster_skills" class="text-soft"></div>
+        </div>
+
+        <div>
+          <div class="text-mid">Senses</div>
+          <div id="monster_senses" class="text-soft"></div>
+        </div>
+
+        <div>
+          <div class="text-mid">Languages</div>
+          <div id="monster_languages" class="text-soft"></div>
+        </div>
+
+        <div class="text-mid text-strong">
+          Abilities
+          <div id="monster_abilities" class="text-small">
+          </div>
+        </div>
+
+        <div class="text-mid text-strong">
+          Actions
+          <div id="monster_actions" class="text-small">
+          </div>
+        </div>
+      </div>
+
+      <div id="magic_sheet" class="hidden"></div>
+
+      <div id="spotify_sheet" class="hidden">
+        <div class="text-huge">Welcome <div id="spotify_name"></div></div>
+      </div>
+    </td>
+  </tr>
+  </tbody></table>
+
+  <div id="template_monster_ability" class="hidden"><div class="text-strong"></div><div class="text-soft"></div></div>
+  <div id="template_monster_action" class="hidden"><div class="text-strong"></div><div class="text-soft"></div></div>
+</body>
+
+<script>
+
+var selected_element = -1;
+
+/* spotify api */
+var client_id = "ef2243a0416a48318ba8fea94b3b53d6";
+
+/* alignments */
+var LAWFUL_GOOD = 0;
+var NEUTRAL_GOOD = 1;
+var CHAOTIC_GOOD = 2;
+var LAWFUL_NEUTRAL = 3;
+var NEUTRAL_NEUTRAL = 4;
+var CHAOTIC_NEUTRAL = 5;
+var LAWFUL_EVIL = 6;
+var NEUTRAL_EVIL = 7;
+var CHAOTIC_EVIL = 8;
+var UNALIGNED = 9;
+
+/* sizes */
+var SMALL = 0;
+var MEDIUM = 1;
+var size_names = ["Small", "Medium"];
+
+/* types */
+var TYPE_MONSTER = 0;
+var TYPE_MAGIC = 1;
+var TYPE_SPOTIFY = 2;
+
+/* languages */
+var LANG_COMMON = 0;
+var LANG_GOBLIN = 1;
+var language_names = ["Common", "Goblin"];
+
+/* data */
+var items = [];
+items.push(monster_create("Goblin", SMALL, NEUTRAL_EVIL, 15, 7, 30, 8, 14, 10, 10, 8, 8,
+  ["Stealth +6"],
+  ["Darkvision 60ft", "Passive Perception 9"],
+  [LANG_COMMON, LANG_GOBLIN], 50,
+  [
+    ability_create("Nimble escape", "The goblin can take the Disengage or Hide action as a bonus action on each of its turns")
+  ],
+  [
+    attack_create("Scimitar", "Hit: +4, one target. Damage: 5 (1d6+2) slashing"),
+    attack_create("Shortbow", "Hit: +4, range 80/320. Damage: 5 (1d6+2) piercing")
+  ],
+  "Goblins are small, black-hearted humanoids that lair in despoiled dungeons and other dismal settings. Individually weak, they gather in large numberss to torment other creatures."));
+items.push(monster_create("Bugbear", MEDIUM, CHAOTIC_EVIL, 16, 27, 30, 15, 14, 13, 8, 11, 9,
+  ["Stealth +6", "Survival +2"],
+  ["Darkvision 60ft", "Passive Perception 10"],
+  [LANG_COMMON, LANG_GOBLIN], 200,
+  [
+    ability_create("Brute", "A melee weapon deals one extra die of its damage when the bugbear hits with it (included in the attack)."),
+    ability_create("Suprise Attack", "If the bugbear surprises a reature and hits it with an attack during the first round of combat, the target takes an extra 7 (2d6) damage from the attack")
+  ],
+  [
+    attack_create("Morningstar", "Hit: +4, one target. Damage: 11 (2d8+2) piercing"),
+    attack_create("Javelin", "Hit: +4, melee damage: 9 (2d6+2) piercing or range 30/120ft 5 (1d6+2) piercing.")
+  ],
+  "Bugbears are hairy goblinoids born for battle and mayhem. They survive by raiding and hunting, but are fond of setting ambushes and fleeing when outmatched."));
+items.push(monster_create("Wolf", MEDIUM, UNALIGNED, 13, 11, 40, 12, 15, 12, 3, 12, 6,
+  ["Perception +3", "Stealth +4"],
+  ["Passive Perception 13"],
+  [], 50,
+  [
+    ability_create("Keen Hearing and Smell", "The wolf has advantage on Wisdom (Perception) checks that rely on hearing or smell."),
+    ability_create("Pack Tactics", "The wolf has advantage on attack rolls against a creature if at least one of the wolf's allies is within 5 feet of the creature and the ally isn't incapacitated.")
+  ],
+  [
+    attack_create("Bite", "Hit: +4, one target. Damage: 7 (2d4+2) piercing. If the target is a creature, it must succeed on a DC 11 Strength saving throw or be knocked prone.")
+  ],
+  ""));
+items.push(magic_create("Mage fire"));
+items.push(magic_create("Small light"));
+items.push(magic_create("Hyper fart"));
+
+var spotify_item = {type: TYPE_SPOTIFY, name: "Spotify"};
+var spotify_logged_in = false;
+items.push(spotify_item);
+
+/* elements */
+var monster_name = document.getElementById("monster_name");
+var monster_size = document.getElementById("monster_size");
+var monster_xp = document.getElementById("monster_xp");
+var monster_ac = document.getElementById("monster_ac");
+var monster_hp = document.getElementById("monster_hp");
+var monster_str = document.getElementById("monster_str");
+var monster_dex = document.getElementById("monster_dex");
+var monster_con = document.getElementById("monster_con");
+var monster_int = document.getElementById("monster_int");
+var monster_wis = document.getElementById("monster_wis");
+var monster_cha = document.getElementById("monster_cha");
+var monster_skills = document.getElementById("monster_skills");
+var monster_senses = document.getElementById("monster_senses");
+var monster_languages = document.getElementById("monster_languages");
+var monster_abilities = document.getElementById("monster_abilities");
+var template_monster_ability = document.getElementById("template_monster_ability");
+var monster_actions = document.getElementById("monster_actions");
+var template_monster_action = document.getElementById("template_monster_action");
+var monster_sheet = document.getElementById("monster_sheet");
+var magic_sheet = document.getElementById("magic_sheet");
+var spotify_sheet = document.getElementById("spotify_sheet");
+var spotify_name = document.getElementById("spotify_name");
+
+/* create search result divs */
+var search_results = [];
+var search_result_boxes = [];
+for (var i = 0; i < 20; ++i) {
+  var e = document.createElement("div");
+  e.className = "hidden";
+  document.getElementById("search_result").appendChild(e);
+  // e.addEventListener("mouseover", function(e) {select_search_result_elem(e.target);});
+  e.addEventListener("mousedown", function(e) {search_result_display_elem(e.target);});
+
+  search_result_boxes.push(e);
+}
+item_display_clear();
+
+var search_field = document.getElementById('search_field');
+
+search_field.addEventListener('keydown', search_field_keypress);
+search_field.focus();
+
+/* check if we came from spotify */
+var spotify_info = get_spotify_info();
+if (spotify_info) {
+  // TODO: restore app state
+  spotify_logged_in = true;
+  input_set(search_field, spotify_info.search_string);
+  update_search_results();
+  item_display(spotify_item);
+}
+
+function get_spotify_info() {
+  // TODO: check for failed spotify login
+  if (!document.location.hash)
+    return null;
+
+  var values = document.location.hash.substr(1).split("&");
+  var result = Object.create(null);
+  for (var i =0 ; i < values.length; ++i) {
+    var s = values[i].split("=");
+    var key = decodeURIComponent(s[0]);
+    var value = decodeURIComponent(s[1]);
+    result[key] = value;
+    console.log(result);
+  }
+
+  if (!result.access_token)
+    return null;
+  if (result.token_type !== "Bearer")
+    return null;
+
+  /* parse state */
+  if (!result.state)
+    return null;
+
+  var state = result.state.split(" ");
+  if (state.length < 2)
+    return null;
+  if (state[0] !== "spotifylogin")
+    return null;
+  result.search_string = state[1];
+
+  rest("https://api.spotify.com/v1/me", "GET", function(data) {
+    data = JSON.parse(data.responseText);
+    spotify_name.textContent = data.display_name;
+  },
+  {Authorization: "Bearer "+result.access_token});
+
+  return result;
+}
+
+function input_default(event) {
+  var e = event.target || event.srcElement;
+  var changed = false;
+  console.log(event.keyCode);
+  if (!event.ctrlKey && event.key.length === 1 && event.key.match(/[a-z0-9 !@#$%^&*()_]/i)) {
+    if (!e.classList.contains("inserting")) {
+      e.textContent = "";
+      e.classList.add("inserting");
+    }
+    e.textContent += event.key;
+    changed = true;
+  }
+  else if (event.keyCode === 27) {
+    input_clear(e);
+    changed = true;
+  }
+  else if (event.keyCode === 8) {
+    if (e.classList.contains("inserting")) {
+      if (!e.textContent || e.textContent.length <= 1)
+        input_clear(e);
+      else
+        e.textContent = e.textContent.substring(0, e.textContent.length-1);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function input_get(e) {
+  return e.textContent;
+}
+
+function input_set(e, str) {
+  if (!str) {
+    input_clear(e);
+    return;
+  }
+
+  e.classList.add("inserting");
+  e.textContent = str;
+}
+
+function input_clear(e) {
+  e.textContent = "search";
+  e.classList.remove("inserting");
+}
+
+function input_isactive(e) {
+  return e.classList.contains("inserting");
+}
+
+function stat_modifier(n) {
+  return Math.floor((n-10)/2);
+}
+function plusminus_str(n) {
+  if (n >= 0)
+    return "+" + n;
+  else
+    return "" + n;
+}
+function stat_modifier_str(n) {
+  return plusminus_str(stat_modifier(n));
+}
+function item_display(item) {
+  item_display_clear();
+
+  switch (item.type) {
+    case TYPE_MAGIC:
+      break;
+
+    case TYPE_SPOTIFY:
+      if (!spotify_logged_in) {
+        // TODO: send in app state as state
+        var scopes = "playlist-read-private user-read-playback-state user-modify-playback-state";
+        redirect("https://accounts.spotify.com/authorize" +
+          "?client_id=" + client_id +
+          "&response_type=token" +
+          "&redirect_uri=" + encodeURIComponent("http://rtensson.se/dnd/index.html") +
+          "&state=" + encodeURIComponent("spotifylogin " + input_get(search_field)) +
+          "&scope=" + encodeURIComponent(scopes));
+      } else {
+        // TODO: rest calls till spotify and show
+        dom_show(spotify_sheet);
+      }
+      break;
+
+    case TYPE_MONSTER:
+      dom_show(monster_sheet);
+      monster_name.textContent = item.name;
+      monster_size.textContent = size_names[item.size];
+      monster_xp.textContent = item.xp;
+      monster_ac.textContent = item.ac;
+      monster_hp.textContent = item.hp;
+      monster_speed.textContent = item.speed + "ft";
+      monster_str.textContent = stat_modifier_str(item.str);
+      monster_dex.textContent = stat_modifier_str(item.dex);
+      monster_con.textContent = stat_modifier_str(item.con);
+      monster_int.textContent = stat_modifier_str(item.int);
+      monster_wis.textContent = stat_modifier_str(item.wis);
+      monster_cha.textContent = stat_modifier_str(item.cha);
+
+      monster_skills.textContent = csv(item.skills);
+      monster_senses.textContent = csv(item.senses);
+      monster_languages.textContent = csv(item.languages, function(x) {return language_names[x];});
+
+      dom_clear(monster_abilities);
+      for (var i = 0; i < item.abilities.length; ++i) {
+        var monster_ability = template_monster_ability.cloneNode(true);
+        monster_ability.classList.remove("hidden");
+        monster_ability.id = null;
+        monster_ability.childNodes[0].textContent = item.abilities[i].name;
+        monster_ability.childNodes[1].textContent = item.abilities[i].description;
+        monster_abilities.appendChild(monster_ability);
+      }
+
+      dom_clear(monster_actions);
+      for (var i = 0; i < item.actions.length; ++i) {
+        var monster_action = template_monster_action.cloneNode(true);
+        monster_action.classList.remove("hidden");
+        monster_action.id + null;
+        monster_action.childNodes[0].textContent = item.actions[i].name;
+        monster_action.childNodes[1].textContent = item.actions[i].description;
+        monster_actions.appendChild(monster_action);
+      }
+
+      break;
+  }
+}
+
+function csv(arr, getstr) {
+  var res = "";
+  for (var i = 0; i < arr.length; ++i) {
+    res += getstr ? getstr(arr[i]) : arr[i];
+    if (i != arr.length-1)
+      res += ", ";
+  }
+  return res;
+}
+
+function item_display_clear() {
+  var children = document.getElementById("item_container").children;
+  for (var i = 0; i < children.length; i++)
+    dom_hide(children[i]);
+}
+
+function select_search_result_elem(elem) {
+	for (var i = 0; i < search_result_boxes.length; ++i)
+		if (search_result_boxes[i] === elem)
+			break;
+	select_search_result(i);
+}
+
+function select_search_result(i) {
+  if (search_results.length != 0 && selected_element >= 0 && selected_element < search_results.length)
+    search_result_boxes[selected_element].classList.remove("selected");
+  if (search_results.length == 0 || i < 0 || i >= search_results.length)
+    return;
+
+	selected_element = i;
+	search_result_boxes[selected_element].classList.add("selected");
+}
+
+function search_result_display_elem(elem) {
+	for (var i = 0; i < search_result_boxes.length; ++i)
+		if (search_result_boxes[i] === elem)
+			break;
+	search_result_display(i);
+}
+
+function search_result_display(index) {
+	select_search_result(index);
+
+  if (selected_element != -1)
+    item_display(search_results[selected_element]);
+}
+
+function search_field_keypress(event) {
+  var changed = input_default(event);
+
+  // Up, down
+  if ((event.keyCode === 38 || event.keyCode === 40) && search_results.length) {
+  	var next_selected_element = selected_element;
+    if (event.keyCode === 40) ++next_selected_element;
+    if (event.keyCode === 38) --next_selected_element;
+    next_selected_element = clamp(next_selected_element, 0, search_results.length-1);
+    select_search_result(next_selected_element);
+    return;
+  }
+
+  // Enter key
+  if (event.keyCode === 13) {
+  	search_result_display(selected_element);
+    return;
+  }
+
+  if (!changed)
+    return;
+
+  update_search_results();
+}
+
+function update_search_results() {
+  var e = search_field;
+  search_results = [];
+
+  for (var i = 0; i < search_result_boxes.length; i++)
+    search_result_boxes[i].className = "hidden";
+
+  if (!input_isactive(e))
+    return;
+
+  var res_idx = 0;
+  for (var i = 0; i < items.length; ++i) {
+    var item = items[i];
+    var r = fuzzy_match(e.textContent, item.name);
+    var match = r[0];
+    var score = r[1];
+    if (!match)
+      continue;
+
+    if (search_results.length < search_result_boxes.length)
+      search_results.push({score: score, item: item});
+    else {
+      /* find worst match and replace */
+      var worst = 0;
+      for (var j = 1; j < search_results.length; ++j)
+        if (search_results[j].score < search_results[worst].score)
+          worst = j;
+      search_results[worst] = {score: score, item: item};
+    }
+
+    var s = search_result_boxes[res_idx++];
+    dom_show(s);
+    s.textContent = item.name;
+    if (res_idx >= search_result_boxes.length)
+      return;
+  }
+
+  search_results.sort(function(a,b) {return b.score - a.score;});
+
+  for (var i = 0; i < search_results.length; ++i) {
+    search_result_boxes[i].textContent = search_results[i].item.name;
+    dom_show(search_result_boxes[i]);
+    switch (search_results[i].item.type) {
+      case TYPE_MONSTER:
+        search_result_boxes[i].classList.toggle("monster", true);
+        break;
+      case TYPE_MAGIC:
+        search_result_boxes[i].classList.toggle("magic", true);
+        break;
+      case TYPE_SPOTIFY:
+        search_result_boxes[i].classList.toggle("spotify", true);
+        break;
+    }
+    search_results[i] = search_results[i].item;
+  }
+  selected_element = 0;
+  search_result_boxes[0].classList.add("selected");
+}
+
+function magic_create(name) {
+  return {
+    type: TYPE_MAGIC,
+    name: name
+  };
+}
+
+function monster_create(name, size, align, ac, hp, speed, str, dex, con, int, wis, cha, skills, senses, languages, xp, abilities, actions, description) {
+  return {
+    type: TYPE_MONSTER,
+    name: name,
+    size: size,
+    alignment: align,
+    ac: ac,
+    hp: hp,
+    speed: speed,
+    str: str,
+    dex: dex,
+    con: con,
+    int: int,
+    wis: wis,
+    cha: cha,
+    skills: skills,
+    senses: senses,
+    languages: languages,
+    xp: xp,
+    abilities: abilities,
+    actions: actions,
+    description: description
+  };
+}
+
+function dom_hide(elem) {
+  elem.classList.add("hidden");
+}
+
+function dom_show(elem) {
+  elem.classList.remove("hidden");
+}
+
+function ability_create(name, desc) {
+  return {name: name, description: desc};
+}
+
+function attack_create(name, desc) {
+  return {name: name, description: desc};
+}
+
+function dom_clear(elem) {
+  while (elem.firstChild)
+    elem.removeChild(elem.firstChild);
+}
+
+// Returns [bool, score]
+function fuzzy_match(pattern, str) {
+  // Score consts
+  var adjacency_bonus = 5;                // bonus for adjacent matches
+  var separator_bonus = 10;               // bonus if match occurs after a separator
+  var camel_bonus = 10;                   // bonus if match is uppercase and prev is lower
+  var leading_letter_penalty = -3;        // penalty applied for every letter in str before the first match
+  var max_leading_letter_penalty = -9;    // maximum penalty for leading letters
+  var unmatched_letter_penalty = -1;      // penalty for every letter that doesn't matter
+
+  // Loop variables
+  var score = 0;
+  var patternIdx = 0;
+  var patternLength = pattern.length;
+  var strIdx = 0;
+  var strLength = str.length;
+  var prevMatched = false;
+  var prevLower = false;
+  var prevSeparator = true;       // true so if first letter match gets separator bonus
+
+  // Use "best" matched letter if multiple string letters match the pattern
+  var bestLetter = null;
+  var bestLower = null;
+  var bestLetterIdx = null;
+  var bestLetterScore = 0;
+
+  var matchedIndices = [];
+
+  // Loop over strings
+  while (strIdx != strLength) {
+      var patternChar = patternIdx != patternLength ? pattern.charAt(patternIdx) : null;
+      var strChar = str.charAt(strIdx);
+
+      var patternLower = patternChar != null ? patternChar.toLowerCase() : null;
+      var strLower = strChar.toLowerCase();
+      var strUpper = strChar.toUpperCase();
+
+      var nextMatch = patternChar && patternLower == strLower;
+      var rematch = bestLetter && bestLower == strLower;
+
+      var advanced = nextMatch && bestLetter;
+      var patternRepeat = bestLetter && patternChar && bestLower == patternLower;
+      if (advanced || patternRepeat) {
+          score += bestLetterScore;
+          matchedIndices.push(bestLetterIdx);
+          bestLetter = null;
+          bestLower = null;
+          bestLetterIdx = null;
+          bestLetterScore = 0;
+      }
+
+      if (nextMatch || rematch) {
+          var newScore = 0;
+
+          // Apply penalty for each letter before the first pattern match
+          // Note: std::max because penalties are negative values. So max is smallest penalty.
+          if (patternIdx == 0) {
+              var penalty = Math.max(strIdx * leading_letter_penalty, max_leading_letter_penalty);
+              score += penalty;
+          }
+
+          // Apply bonus for consecutive bonuses
+          if (prevMatched)
+              newScore += adjacency_bonus;
+
+          // Apply bonus for matches after a separator
+          if (prevSeparator)
+              newScore += separator_bonus;
+
+          // Apply bonus across camel case boundaries. Includes "clever" isLetter check.
+          if (prevLower && strChar == strUpper && strLower != strUpper)
+              newScore += camel_bonus;
+
+          // Update patter index IFF the next pattern letter was matched
+          if (nextMatch)
+              ++patternIdx;
+
+          // Update best letter in str which may be for a "next" letter or a "rematch"
+          if (newScore >= bestLetterScore) {
+
+              // Apply penalty for now skipped letter
+              if (bestLetter != null)
+                  score += unmatched_letter_penalty;
+
+              bestLetter = strChar;
+              bestLower = bestLetter.toLowerCase();
+              bestLetterIdx = strIdx;
+              bestLetterScore = newScore;
+          }
+
+          prevMatched = true;
+      }
+      else {
+          score += unmatched_letter_penalty;
+          prevMatched = false;
+      }
+
+      // Includes "clever" isLetter check.
+      prevLower = strChar == strLower && strLower != strUpper;
+      prevSeparator = strChar == '_' || strChar == ' ';
+
+      ++strIdx;
+  }
+
+  // Apply score for last match
+  if (bestLetter) {
+      score += bestLetterScore;
+      matchedIndices.push(bestLetterIdx);
+  }
+
+  var matched = patternIdx == patternLength;
+  return [matched, score];
+}
+
+function clamp(x, a, b) {
+  if (x < a) return a;
+  if (x > b) return b;
+  return x;
+}
+
+function redirect(url) {
+  window.location.href = url;
+}
+
+// method = {GET, PUT, POST, DELETE}
+function rest(url, method, callback, headers) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200)
+      callback(this);
+  };
+  xhttp.open(method, url, true);
+  if (headers) {
+    var keys = Object.keys(headers);
+    for (var i = 0; i < keys.length; ++i)
+      xhttp.setRequestHeader(keys[i], headers[keys[i]]);
+  }
+  xhttp.send();
+}
+
+</script>
+</html>
