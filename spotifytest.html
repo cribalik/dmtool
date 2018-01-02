@@ -1,0 +1,140 @@
+<html>
+  <head>
+    <style>
+      .my-button {
+        background-color: #2196f3;
+        color: white;
+        box-shadow: 1px 2px 7px rgba(0, 0, 0, 0.5);
+        display: inline-block;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 2px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        padding: 10px;
+        background-color: grey;
+        font-family: sans-serif;
+      }
+      #playlists {
+        width: 80%;
+        margin: 20px auto 20px auto;
+        padding: 20px;
+        background-color: #134414;
+        border: 2px solid darkgreen;
+        color: white;
+      }
+      #playlists > * {
+        border-bottom: 2px solid darkgreen;
+        padding: 10px;
+      }
+      #playlists > *:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 id="user-name"></h1>
+    <div id="main-button" class="my-button">Spotify login</div>
+    <div id="playlists">
+      
+    </div>
+  </body>
+
+  <script>
+
+    var spotify_logged_in = false;
+
+    // check if we came from spotify
+    if (document.location.hash) {
+      var spotify_info = decodeQueryString(document.location.hash.substring(1));
+      if (spotify_info && spotify_info.access_token)
+        spotify_logged_in = true;
+
+      if (spotify_logged_in) {
+        rest(
+          "https://api.spotify.com/v1/me",
+          function(request) {
+            var data = JSON.parse(request.responseText);
+            document.getElementById('user-name').textContent = "Welcome, " + data.display_name + "!";
+          },
+          {Authorization: "Bearer "+spotify_info.access_token}
+        );
+
+        rest("https://api.spotify.com/v1/me/playlists",
+          function(request) {
+            var data = JSON.parse(request.responseText);
+
+            for (var i = 0; i < data.items.length; ++i) {
+              var e = document.createElement("div");
+              e.textContent = data.items[i].name;
+              document.getElementById("playlists").appendChild(e);
+            }
+          },
+          {Authorization: "Bearer "+spotify_info.access_token}
+        );
+      }
+    }
+
+
+    var e = document.getElementById("main-button");
+    e.addEventListener("click", function() {
+      var client_id = "ef2243a0416a48318ba8fea94b3b53d6";
+      var scopes = "playlist-read-private user-library-read";
+      redirect("https://accounts.spotify.com/authorize" +
+        "?client_id=" + client_id +
+        "&response_type=token" +
+        "&redirect_uri=" + encodeURIComponent("https://rtensson.se/dnd/spotifytest.html") +
+        "&state=" + encodeURIComponent("spotify") +
+        "&scope=" + encodeURIComponent(scopes)
+      );
+    });
+
+    function rest(url, callback, headers) {
+      if (!url) return;
+
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function() {
+        if (callback && this.readyState == 4 && this.status == 200)
+          callback(request);
+      }
+      request.open("GET", url, true);
+      if (headers) {
+        var keys = Object.keys(headers);
+        for (var i = 0; i < keys.length; ++i) {
+          request.setRequestHeader(keys[i], headers[keys[i]]);
+        }
+      }
+      request.send();
+    }
+
+    function redirect(url) {
+      window.location = url;
+    }
+
+    function decodeQueryString(str) {
+      var arr = decodeURIComponent(str).split("&");
+      var result = {};
+
+      for (var i = 0; i < arr.length; ++i) {
+        var s = arr[i].split("=");
+        if (s.length != 2) {
+          console.error("Invalid query string parameter " + arr[i]);
+          return null;
+        }
+
+        var key = s[0];
+        var value = s[1];
+
+        result[key] = value;
+      }
+
+      return result;
+    }
+
+  </script>
+</html>

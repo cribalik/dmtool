@@ -220,31 +220,40 @@ var selected_element = -1;
 var client_id = "ef2243a0416a48318ba8fea94b3b53d6";
 
 /* alignments */
-var LAWFUL_GOOD = 0;
-var NEUTRAL_GOOD = 1;
-var CHAOTIC_GOOD = 2;
-var LAWFUL_NEUTRAL = 3;
+var LAWFUL_GOOD     = 0;
+var NEUTRAL_GOOD    = 1;
+var CHAOTIC_GOOD    = 2;
+var LAWFUL_NEUTRAL  = 3;
 var NEUTRAL_NEUTRAL = 4;
 var CHAOTIC_NEUTRAL = 5;
-var LAWFUL_EVIL = 6;
-var NEUTRAL_EVIL = 7;
-var CHAOTIC_EVIL = 8;
-var UNALIGNED = 9;
+var LAWFUL_EVIL     = 6;
+var NEUTRAL_EVIL    = 7;
+var CHAOTIC_EVIL    = 8;
+var UNALIGNED       = 9;
+var ALIGNMENT_COUNT = 10;
+var alignment_names = [
+  "Lawful good", "Neutral good", "Chaotic good", "Lawful neutral",
+  "Neutral", "Chaotic neutral", "Lawful evil", "Neutral evil", "Chaotic evil", "Unaligned"];
+assert(alignment_names.length == ALIGNMENT_COUNT, "Not all alignments named");
 
 /* sizes */
-var SMALL = 0;
-var MEDIUM = 1;
+var SMALL      = 0;
+var MEDIUM     = 1;
+var SIZE_COUNT = 2;
 var size_names = ["Small", "Medium"];
+assert(size_names.length == SIZE_COUNT, "Not all sizes named");
 
 /* types */
 var TYPE_MONSTER = 0;
-var TYPE_MAGIC = 1;
+var TYPE_MAGIC   = 1;
 var TYPE_SPOTIFY = 2;
 
 /* languages */
 var LANG_COMMON = 0;
 var LANG_GOBLIN = 1;
+var LANG_COUNT  = 2;
 var language_names = ["Common", "Goblin"];
+assert(language_names.length == LANG_COUNT, "Not all languages named");
 
 /* data */
 var items = [];
@@ -299,28 +308,28 @@ var spotify_logged_in = false;
 items.push(spotify_item);
 
 /* elements */
-var monster_name = document.getElementById("monster_name");
-var monster_size = document.getElementById("monster_size");
-var monster_xp = document.getElementById("monster_xp");
-var monster_ac = document.getElementById("monster_ac");
-var monster_hp = document.getElementById("monster_hp");
-var monster_str = document.getElementById("monster_str");
-var monster_dex = document.getElementById("monster_dex");
-var monster_con = document.getElementById("monster_con");
-var monster_int = document.getElementById("monster_int");
-var monster_wis = document.getElementById("monster_wis");
-var monster_cha = document.getElementById("monster_cha");
-var monster_skills = document.getElementById("monster_skills");
-var monster_senses = document.getElementById("monster_senses");
-var monster_languages = document.getElementById("monster_languages");
-var monster_abilities = document.getElementById("monster_abilities");
+var monster_name             = document.getElementById("monster_name");
+var monster_size             = document.getElementById("monster_size");
+var monster_xp               = document.getElementById("monster_xp");
+var monster_ac               = document.getElementById("monster_ac");
+var monster_hp               = document.getElementById("monster_hp");
+var monster_str              = document.getElementById("monster_str");
+var monster_dex              = document.getElementById("monster_dex");
+var monster_con              = document.getElementById("monster_con");
+var monster_int              = document.getElementById("monster_int");
+var monster_wis              = document.getElementById("monster_wis");
+var monster_cha              = document.getElementById("monster_cha");
+var monster_skills           = document.getElementById("monster_skills");
+var monster_senses           = document.getElementById("monster_senses");
+var monster_languages        = document.getElementById("monster_languages");
+var monster_abilities        = document.getElementById("monster_abilities");
 var template_monster_ability = document.getElementById("template_monster_ability");
-var monster_actions = document.getElementById("monster_actions");
-var template_monster_action = document.getElementById("template_monster_action");
-var monster_sheet = document.getElementById("monster_sheet");
-var magic_sheet = document.getElementById("magic_sheet");
-var spotify_sheet = document.getElementById("spotify_sheet");
-var spotify_name = document.getElementById("spotify_name");
+var monster_actions          = document.getElementById("monster_actions");
+var template_monster_action  = document.getElementById("template_monster_action");
+var monster_sheet            = document.getElementById("monster_sheet");
+var magic_sheet              = document.getElementById("magic_sheet");
+var spotify_sheet            = document.getElementById("spotify_sheet");
+var spotify_name             = document.getElementById("spotify_name");
 
 /* create search result divs */
 var search_results = [];
@@ -356,13 +365,16 @@ var _assert_msg = "";
 function assert_begin(msg) {
   _assert_msg = msg;
 }
-function assert(bool) {
+function assert(bool, msg) {
   if (bool)
     return;
   if (_has_assert_failed)
     return;
   _has_assert_failed = true;
-  alert(_assert_msg);
+  if (msg)
+    alert(msg);
+  else
+    alert(_assert_msg);
 }
 
 function verify_item(item) {
@@ -848,9 +860,12 @@ function redirect(url) {
 
 // method = {GET, PUT, POST, DELETE}
 function rest(url, method, callback, headers) {
+  if (!url)
+    return;
+
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200)
+    if (callback && this.readyState == 4 && this.status == 200)
       callback(this);
   };
   xhttp.open(method, url, true);
