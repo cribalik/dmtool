@@ -48,10 +48,11 @@
   <script>
 
     var spotify_logged_in = false;
+    var playlists = list_create(document.getElementById("playlists"));
 
     // check if we came from spotify
     if (document.location.hash) {
-      var spotify_info = decodeQueryString(document.location.hash.substring(1));
+      var spotify_info = decodeQueryString(document.location.hash);
       if (spotify_info && spotify_info.access_token)
         spotify_logged_in = true;
 
@@ -68,12 +69,7 @@
         rest("https://api.spotify.com/v1/me/playlists",
           function(request) {
             var data = JSON.parse(request.responseText);
-
-            for (var i = 0; i < data.items.length; ++i) {
-              var e = document.createElement("div");
-              e.textContent = data.items[i].name;
-              document.getElementById("playlists").appendChild(e);
-            }
+            list_update(playlists, data.items, function(d) {return d.name;});
           },
           {Authorization: "Bearer "+spotify_info.access_token}
         );
@@ -94,6 +90,32 @@
       );
     });
 
+    function list_create(element) {
+      return {element: element};
+    }
+
+    function list_update(list, data, mapper) {
+      var elements = [];
+
+      dom_clear(list.element);
+      list.children = [];
+
+      for (var i = 0; i < data.length; ++i) {
+        var child = document.createElement("div");
+        if (mapper)
+          child.textContent = mapper(data[i]);
+        else
+          child.textContent = data[i];
+        list.element.appendChild(child);
+        list.children.push(e);
+      }
+    }
+
+    function dom_clear(elem) {
+      while (elem.firstChild)
+        elem.removeChild(elem.firstChild);
+    }
+
     function rest(url, callback, headers) {
       if (!url) return;
 
@@ -105,9 +127,8 @@
       request.open("GET", url, true);
       if (headers) {
         var keys = Object.keys(headers);
-        for (var i = 0; i < keys.length; ++i) {
+        for (var i = 0; i < keys.length; ++i)
           request.setRequestHeader(keys[i], headers[keys[i]]);
-        }
       }
       request.send();
     }
@@ -116,9 +137,15 @@
       window.location = url;
     }
 
+    // str: defaults to query string of current location
     function decodeQueryString(str) {
-      var arr = decodeURIComponent(str).split("&");
-      var result = {};
+      str = str || window.location.search;
+
+      if (!str)
+        return null;
+
+      var result = Object.create(null);
+      var arr = str.substring(1).split("&");
 
       for (var i = 0; i < arr.length; ++i) {
         var s = arr[i].split("=");
@@ -127,8 +154,8 @@
           return null;
         }
 
-        var key = s[0];
-        var value = s[1];
+        var key = decodeURIComponent(s[0]);
+        var value = decodeURIComponent(s[1]);
 
         result[key] = value;
       }
