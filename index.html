@@ -549,7 +549,7 @@ function item_display(item) {
 
       monster_skills.textContent = csv(item.skills);
       monster_senses.textContent = csv(item.senses);
-      monster_languages.textContent = csv(item.languages, function(x) {return language_names[x];});
+      monster_languages.textContent = csv(item.languages, language_name);
 
       dom_clear(monster_abilities);
       for (var i = 0; i < item.abilities.length; ++i) {
@@ -573,6 +573,10 @@ function item_display(item) {
 
       break;
   }
+}
+
+function language_name(l) {
+  return language_names[l];
 }
 
 function csv(arr, getstr) {
