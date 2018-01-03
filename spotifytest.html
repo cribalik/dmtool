@@ -116,7 +116,7 @@
         elem.removeChild(elem.firstChild);
     }
 
-    function rest(url, callback, headers) {
+    function rest(url, callback, headers, body) {
       if (!url) return;
 
       var request = new XMLHttpRequest();
@@ -130,7 +130,10 @@
         for (var i = 0; i < keys.length; ++i)
           request.setRequestHeader(keys[i], headers[keys[i]]);
       }
-      request.send();
+      if (body)
+        request.send(body);
+      else
+        request.send();
     }
 
     function redirect(url) {
